@@ -1,0 +1,55 @@
+{
+  "name": "@metreeca/trio",
+  "version": "0.1.0",
+  "description": "A lightweight TypeScript library for RDF data modelling, graph assembly and serialisation.",
+  "keywords": [
+    "typescript",
+    "rdf",
+    "linked-data",
+    "semantic-web"
+  ],
+  "homepage": "https://metreeca.github.io/trio/",
+  "bugs": {
+    "url": "https://github.com/metreeca/trio/issues",
+    "email": "info@metreeca.com"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Metreeca",
+    "email": "info@metreeca.com",
+    "url": "https://www.metreeca.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metreeca/trio.git"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "clean": "rm -rf dist docs node_modules",
+    "setup": "npm install",
+    "build": "rm -rf dist docs && npx tsc && npx typedoc",
+    "check": "npx vitest run",
+    "proof": "npx typedoc && (npx typedoc --watch & npx five-server docs --open)"
+  },
+  "dependencies": {
+    "@metreeca/core": "^0.9.11"
+  },
+  "devDependencies": {
+    "five-server": "^0.4.5",
+    "typedoc": "^0.28.14",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.13"
+  }
+}

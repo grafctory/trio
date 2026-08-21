@@ -1,5 +1,15 @@
 {
   "tsconfig": "./tsconfig.build.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/builder.ts",
+    "src/ntriples/index.ts"
+  ],
+  "externalSymbolLinkMappings": {
+    "@metreeca/core": {
+      "*": "https://metreeca.github.io/core/"
+    }
+  },
   "includeVersion": true,
   "excludeExternals": true,
   "sort": [

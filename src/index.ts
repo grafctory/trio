@@ -15,11 +15,438 @@
  */
 
 /**
- * RDF data model.
+ * RDF 1.1 data model.
  *
- * Defines the terms and graphs shared across Metreeca packages, independently of any query language or store.
+ * Defines the RDF 1.1 terms and statements making up an RDF graph, together with the factories that construct
+ * well-formed ones, alongside the standard vocabulary namespaces the model is described with.
+ *
+ * **Vocabularies**
+ *
+ * - {@link rdf} — RDF vocabulary namespace
+ * - {@link rdfs} — RDFS vocabulary namespace
+ *
+ * **Data model**
+ *
+ * - {@link Graph} — flat sequence of {@link Triple | triples}
+ * - {@link Triple} — ground subject/predicate/object statement
+ * - {@link Term} — RDF term: a blank node, a named resource, or a literal
+ * - {@link Blank} — blank node, as a document-scoped label
+ * - {@link Named} — named resource, as an absolute IRI
+ * - {@link Tagged} — language-tagged literal
+ * - {@link Typed} — datatype-typed literal
+ *
+ * **Factories**
+ *
+ * - {@link graph} — construct a {@link Graph}
+ * - {@link triple} — construct a {@link Triple}
+ * - {@link blank} — construct a {@link Blank | blank node}
+ * - {@link named} — construct a {@link Named | named resource}
+ * - {@link tagged} — construct a {@link Tagged} literal
+ * - {@link typed} — construct a {@link Typed} literal
+ *
+ * **Utilities**
+ *
+ * - {@link skolemize} — replace a {@link Graph | graph}'s blank nodes with minted named resources
  *
  * @module
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/ RDF 1.1 Concepts and Abstract Syntax}
  */
 
-export {};
+import { error, isNumber, isString, type Scalar } from "@metreeca/core";
+import { xsd } from "@metreeca/core/datatype";
+import { immutable } from "@metreeca/core/structures";
+import { isTag, type Tag } from "@metreeca/core/language";
+import { createNamespace, type IRI, isIRI } from "@metreeca/core/resource";
+import { createScope } from "@metreeca/core/scope";
+import { isWellFormed } from "@metreeca/core/strings";
+import { BLANK_NODE } from "./index.core.js";
+
+
+/**
+ * Matches a well-formed string blank-node label.
+ *
+ * Anchors {@link BLANK_NODE} to the whole string, as the label validation performed by {@link blank} requires.
+ */
+const BlankPattern = new RegExp(`^${BLANK_NODE}$`, "u");
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * RDF vocabulary namespace.
+ *
+ * A closed namespace of the RDF 1.1 vocabulary IRIs, covering the core classes, the container and collection
+ * vocabularies, the RDF-defined datatypes, and the typing, reification and collection properties.
+ *
+ * > [!NOTE]
+ * > RDF/XML syntax terms (`RDF`, `Description`, `about`, `parseType`, and so on) are not included: they carry
+ * > document-serialisation semantics of little use as standalone vocabulary identifiers. The open-ended container
+ * > membership properties (`_1`, `_2`, …) are likewise omitted, as they cannot be enumerated.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/ RDF 1.1 Concepts and Abstract Syntax}
+ */
+export const rdf = createNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#", [
+
+	"Property",
+	"Statement",
+
+	"Bag",
+	"Seq",
+	"Alt",
+
+	"List",
+	"nil",
+
+	"XMLLiteral",
+	"HTML",
+	"langString",
+
+	"type",
+
+	"subject",
+	"predicate",
+	"object",
+
+	"value",
+
+	"first",
+	"rest"
+
+]);
+
+/**
+ * RDFS vocabulary namespace.
+ *
+ * A closed namespace of the complete RDF Schema 1.1 vocabulary IRIs, covering the schema classes, the class and
+ * property hierarchy relations, the property signature relations, the annotation properties, and the container
+ * membership shorthand.
+ *
+ * @see {@link https://www.w3.org/TR/rdf-schema/ RDF Schema 1.1}
+ */
+export const rdfs = createNamespace("http://www.w3.org/2000/01/rdf-schema#", [
+
+	"Resource",
+	"Class",
+	"Literal",
+	"Datatype",
+	"Container",
+	"ContainerMembershipProperty",
+
+	"subClassOf",
+	"subPropertyOf",
+
+	"domain",
+	"range",
+
+	"label",
+	"comment",
+
+	"seeAlso",
+	"isDefinedBy",
+
+	"member"
+
+]);
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * An RDF graph, as a flat sequence of {@link Triple | triples}.
+ *
+ * Carried as a plain array of statements; read as an RDF graph, neither their order nor any repetition is significant.
+ * Construct one with {@link graph}.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-rdf-graph RDF 1.1 Graphs}
+ */
+export type Graph =
+	readonly Triple[];
+
+/**
+ * An RDF triple, as a subject/predicate/object statement.
+ *
+ * The subject is a {@link Named | named resource} or a {@link Blank | blank node}, the predicate always a named
+ * resource, and the object any {@link Term}: a named resource, a blank node, or a language-{@link Tagged | tagged} or
+ * datatype-{@link Typed | typed} literal.
+ *
+ * A typing statement carries the `type` IRI of the {@link rdf} vocabulary namespace in predicate position: the `a`
+ * shorthand of the Turtle and SPARQL syntaxes is a serialisation concern, foreign to the data model.
+ *
+ * Construct one with {@link triple}.
+ *
+ * > [!NOTE]
+ * > A {@link Blank | blank node} carries no stable identity across queries or stores: its label is meaningful only
+ * > within the document that introduced it. An anchor that must survive a round-trip is better minted as an opaque
+ * > `urn:uuid:` resource with {@link named} than left blank.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-rdf-triple RDF 1.1 Triples}
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-subject RDF 1.1 Subject}
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-predicate RDF 1.1 Predicate}
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-object RDF 1.1 Object}
+ */
+export type Triple = readonly [
+		Blank | Named,
+	Named,
+	Term
+];
+
+/**
+ * An RDF term.
+ *
+ * The tagged union of a {@link Blank | blank node}, a {@link Named | named resource}, a
+ * language-{@link Tagged | tagged} literal, and a datatype-{@link Typed | typed} literal: the values admitted in the
+ * object position of a {@link Triple}, whose subject and predicate positions admit narrower subsets. Every form carries
+ * a `kind` discriminator, so a term is narrowed by testing that tag rather than by probing for properties.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-rdf-term RDF 1.1 Terms}
+ */
+export type Term =
+	| Blank
+	| Named
+	| Tagged
+	| Typed;
+
+/**
+ * An RDF blank node.
+ *
+ * Carries the bare label identifying the node within a single document, for example `0` for the `_:0` rendering: the
+ * `_:` prefix belongs to the N-Triples/SPARQL syntax and is supplied by the serialisers rather than stored.
+ * Blank-node identity is document-scoped: a label carries no meaning across queries or stores. Mint one with
+ * {@link blank}.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-blank-node RDF 1.1 Blank Nodes}
+ */
+export type Blank = {
+
+	readonly kind: "blank";
+
+	readonly label: string
+
+};
+
+/**
+ * An RDF named resource.
+ *
+ * Carries the absolute {@link IRI} denoting an RDF resource. Admitted in every {@link Triple} position: always as the
+ * predicate, and as one of the forms the subject and object {@link Term | terms} may take. Construct one with
+ * {@link named}.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#section-IRIs RDF 1.1 IRIs}
+ */
+export type Named = {
+
+	readonly kind: "named";
+
+	readonly iri: IRI
+
+};
+
+/**
+ * An RDF language-tagged string.
+ *
+ * Pairs the lexical form with the BCP 47 tag identifying its natural language. Distinct from a
+ * {@link Typed} literal because the language tag participates in term identity and equality. One of the
+ * literal forms making up {@link Term}. Construct one with {@link tagged}.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-language-tagged-string RDF 1.1 Language-tagged strings}
+ */
+export type Tagged = {
+
+	readonly kind: "tagged";
+
+	readonly text: string;
+	readonly language: Tag
+
+};
+
+/**
+ * An RDF typed literal.
+ *
+ * Pairs the lexical form with the {@link IRI} of its XSD (or user-defined) datatype. Per RDF 1.1, a literal with no
+ * datatype IRI is interpreted as `xsd:string`: `datatype` is always present, carrying that IRI explicitly for a plain
+ * literal, so readers never test for its absence. One of the literal forms making up {@link Term}. Construct one with
+ * {@link typed}.
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-literal RDF 1.1 Literals}
+ */
+export type Typed = {
+
+	readonly kind: "typed";
+
+	readonly text: string;
+	readonly datatype: IRI
+
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Creates an RDF {@link Graph}.
+ *
+ * Collects the supplied {@link Triple | triples} into a flat sequence. The supplied triples are cloned, so later
+ * changes to them are not reflected in the graph.
+ *
+ * @param triples - The triples making up the graph
+ *
+ * @returns An immutable {@link Graph} of the supplied triples
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-rdf-graph RDF 1.1 Graphs}
+ */
+export function graph(...triples: readonly Triple[]): Graph {
+	return immutable(triples);
+}
+
+/**
+ * Creates an RDF {@link Triple}.
+ *
+ * Assembles a subject/predicate/object statement from ready positions.
+ *
+ * @param subject - The subject: a {@link Blank | blank node} or a {@link Named | named resource}
+ * @param predicate - The predicate: a {@link Named | named resource}
+ * @param object - The object: any RDF {@link Term}
+ *
+ * @returns An immutable {@link Triple} of the three positions
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-rdf-triple RDF 1.1 Triples}
+ */
+export function triple(subject: Blank | Named, predicate: Named, object: Term): Triple {
+	return immutable([subject, predicate, object]);
+}
+
+/**
+ * Creates an RDF {@link Blank | blank node}.
+ *
+ * Wraps the supplied label into a blank node, storing it bare: the `_:` prefix belongs to the N-Triples/SPARQL syntax
+ * and is added by the serialisers. With no argument, mints a fresh node with a random label for an anonymous one;
+ * supply a label only where blank-node identity must be correlated within a single document. The returned record is
+ * frozen.
+ *
+ * > [!WARNING]
+ * > A string label is validated against the intersection of the N-Triples, Turtle and SPARQL 1.1 `BLANK_NODE_LABEL`
+ * > productions, so that every accepted label is serialisable in all three syntaxes; the grammars differ only on `:`,
+ * > which N-Triples admits within a label and the other two do not, and which is consequently rejected.
+ *
+ * @param label - The blank-node label: a non-negative integer, or a string matching the `BLANK_NODE_LABEL` body;
+ * 		omitted to mint a fresh anonymous node
+ *
+ * @returns A frozen {@link Blank} record carrying the label
+ *
+ * @throws RangeError if `label` is a negative or non-integer number, or a malformed string label
+ *
+ * @see {@link https://www.w3.org/TR/n-triples/#grammar-production-BLANK_NODE_LABEL N-Triples §3 — BLANK_NODE_LABEL}
+ * @see {@link https://www.w3.org/TR/turtle/#grammar-production-BLANK_NODE_LABEL Turtle §6.5 — BLANK_NODE_LABEL}
+ * @see {@link https://www.w3.org/TR/sparql11-query/#rBLANK_NODE_LABEL SPARQL 1.1 §19.8 — BLANK_NODE_LABEL}
+ */
+export function blank(label?: number | string): Blank {
+	return label === undefined ? immutable({ kind: "blank", label: crypto.randomUUID().replaceAll("-", "") })
+		: isNumber(label) && Number.isInteger(label) && label >= 0 ? immutable({ kind: "blank", label: String(label) })
+			: isString(label) && BlankPattern.test(label) ? immutable({ kind: "blank", label })
+				: error(new RangeError(`malformed blank-node label <${label}>`));
+}
+
+/**
+ * Creates an RDF {@link Named | named resource}.
+ *
+ * Boxes a well-formed absolute IRI. With no argument, mints a fresh opaque `urn:uuid:` resource for an anonymous
+ * anchor. A blank-node label is not an absolute IRI and is rejected like any other malformed value. The returned
+ * record is frozen.
+ *
+ * @param iri - The IRI to validate and box; omitted to mint a fresh `urn:uuid:` resource
+ *
+ * @returns A frozen {@link Named} record carrying the validated or minted IRI
+ *
+ * @throws RangeError if `iri` is a relative or otherwise malformed IRI
+ */
+export function named(iri?: IRI): Named {
+	return iri === undefined ? immutable({ kind: "named", iri: `urn:uuid:${crypto.randomUUID()}` })
+		: isIRI(iri, "absolute") ? immutable({ kind: "named", iri })
+			: error(new RangeError(`relative or malformed IRI reference <${iri}>`));
+}
+
+/**
+ * Creates an RDF language-tagged string.
+ *
+ * Pairs the validated lexical form with the validated BCP 47 tag identifying its natural language. The returned record
+ * is frozen.
+ *
+ * Both components are checked here rather than at serialisation: {@link Tag} is a documentation alias for `string`, so
+ * nothing in the type stops a caller from supplying a tag carrying grammar delimiters, and no RDF syntax defines an
+ * escape for a language tag, leaving a serialiser to render it verbatim into forged statements.
+ *
+ * @param text - The lexical form of the literal
+ * @param language - The BCP 47 language tag
+ *
+ * @returns A frozen {@link Tagged} record carrying the lexical form and the language tag
+ *
+ * @throws RangeError if `text` is not a well-formed Unicode string, that is if it holds an isolated UTF-16 surrogate
+ * 		code point, or if `language` is not a well-formed BCP 47 language tag
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-language-tagged-string RDF 1.1 Language-tagged strings}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc5646.html#section-2.1 RFC 5646 § 2.1 - Language Tag Syntax}
+ */
+export function tagged(text: string, language: Tag): Tagged {
+	return !isWellFormed(text) ? error(new RangeError(`malformed lexical form <${text}>`))
+		: !isTag(language) ? error(new RangeError(`malformed language tag <${language}>`))
+			: immutable({ kind: "tagged", text, language });
+}
+
+/**
+ * Creates an RDF typed literal.
+ *
+ * Pairs the validated lexical form with the validated {@link IRI} of its XSD (or user-defined) datatype, defaulting
+ * to the `xsd:string` IRI RDF 1.1 reads into an unannotated literal. A non-string scalar is coerced to its lexical
+ * form via `String()`, and the coerced form is what gets validated. The returned record is frozen.
+ *
+ * @param text - The lexical form of the literal, as a {@link Scalar} coerced to a string via `String()`
+ * @param datatype - The IRI of the literal datatype; defaults to `xsd:string`
+ *
+ * @returns A frozen {@link Typed} record carrying the lexical form and the datatype
+ *
+ * @throws RangeError if the coerced `text` is not a well-formed Unicode string, that is if it holds an isolated
+ * 		UTF-16 surrogate code point, or if `datatype` is a relative or otherwise malformed IRI
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-literal RDF 1.1 Literals}
+ */
+export function typed(text: Scalar, datatype: IRI = xsd.string): Typed {
+
+	const lexical = String(text);
+
+	return !isWellFormed(lexical) ? error(new RangeError(`malformed lexical form <${lexical}>`))
+		: !isIRI(datatype, "absolute") ? error(new RangeError(`relative or malformed datatype IRI <${datatype}>`))
+			: immutable({ kind: "typed", text: lexical, datatype });
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Replaces blank nodes in a {@link Graph} with minted named resources.
+ *
+ * Skolemises each {@link Blank | blank node} to a fresh `urn:uuid:` {@link Named | named resource}, correlating
+ * repeated labels to the same resource within the graph so blank-node identity is preserved; ground terms pass
+ * through unchanged. The correlation scope is per call, so the same label skolemised in a later call yields a
+ * different resource.
+ *
+ * @param graph - The graph to skolemise
+ *
+ * @returns A new {@link Graph} with every {@link Blank | blank node} replaced by a minted
+ * 		{@link Named | named resource}
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#section-skolemization RDF 1.1 — Skolemization}
+ */
+export function skolemize(graph: Graph): Graph {
+
+	const names = createScope(() => named());
+
+	return graph.map(([subject, predicate, object]) =>
+		[resolve(subject), resolve(predicate), resolve(object)]
+	);
+
+	function resolve<T extends Term>(term: T) {
+		return term.kind === "blank" ? names.resolve(term.label) : term;
+	}
+
+}

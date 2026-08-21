@@ -61,15 +61,19 @@ export function encodeNTriples(graph: Graph): string {
 		switch ( term.kind ) {
 
 			case "blank":
+
 				return blank(term);
 
 			case "named":
+
 				return named(term);
 
 			case "tagged":
+
 				return tagged(term);
 
 			case "typed":
+
 				return typed(term);
 
 		}

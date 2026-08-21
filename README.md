@@ -67,6 +67,9 @@ Malformed components are rejected where the term is built, rather than escaping 
 blank-node label outside the intersection of the N-Triples, Turtle and SPARQL 1.1 grammars, a language tag outside BCP
 47, or a lexical form holding an isolated UTF-16 surrogate all throw a `RangeError`.
 
+`lexical` reads back the bare string a term carries, undecorated by serialisation syntax: the blank-node label, the
+absolute IRI, or the literal lexical form, whatever the form of the term.
+
 Blank-node identity is scoped to the document that introduced it: `skolemize` replaces every blank node of a graph with
 a minted `urn:uuid:` resource, correlating repeated labels to the same resource.
 

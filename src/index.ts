@@ -46,6 +46,7 @@
  *
  * **Utilities**
  *
+ * - {@link lexical} — retrieve the lexical form of a {@link Term}
  * - {@link skolemize} — replace a {@link Graph | graph}'s blank nodes with minted named resources
  *
  * @module
@@ -55,11 +56,11 @@
 
 import { error, isNumber, isString, type Scalar } from "@metreeca/core";
 import { xsd } from "@metreeca/core/datatype";
-import { immutable } from "@metreeca/core/structures";
 import { isTag, type Tag } from "@metreeca/core/language";
 import { createNamespace, type IRI, isIRI } from "@metreeca/core/resource";
 import { createScope } from "@metreeca/core/scope";
 import { isWellFormed } from "@metreeca/core/strings";
+import { immutable } from "@metreeca/core/structures";
 import { BLANK_NODE } from "./index.core.js";
 
 
@@ -185,11 +186,8 @@ export type Graph =
  * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-predicate RDF 1.1 Predicate}
  * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-object RDF 1.1 Object}
  */
-export type Triple = readonly [
-		Blank | Named,
-	Named,
-	Term
-];
+export type Triple =
+	readonly [Blank | Named, Named, Term];
 
 /**
  * An RDF term.
@@ -197,7 +195,8 @@ export type Triple = readonly [
  * The tagged union of a {@link Blank | blank node}, a {@link Named | named resource}, a
  * language-{@link Tagged | tagged} literal, and a datatype-{@link Typed | typed} literal: the values admitted in the
  * object position of a {@link Triple}, whose subject and predicate positions admit narrower subsets. Every form carries
- * a `kind` discriminator, so a term is narrowed by testing that tag rather than by probing for properties.
+ * a `kind` discriminator, so a term is narrowed by testing that tag rather than by probing for properties, or read
+ * with {@link lexical} without narrowing at all.
  *
  * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-rdf-term RDF 1.1 Terms}
  */
@@ -421,6 +420,45 @@ export function typed(text: Scalar, datatype: IRI = xsd.string): Typed {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Retrieves the lexical form of an RDF {@link Term}.
+ *
+ * Projects a term onto the bare string it carries: the document-scoped label of a {@link Blank | blank node}, the
+ * absolute IRI of a {@link Named | named resource}, or the lexical form of a language-{@link Tagged | tagged} or
+ * datatype-{@link Typed | typed} literal. RDF 1.1 defines the lexical form for literals alone: the projection is
+ * extended to the other forms, so that a value is read off a term without first narrowing on its `kind`.
+ *
+ * The string is returned as stored, undecorated: the `_:` blank-node prefix, the IRI angle brackets, and the literal
+ * quotes, language tag and datatype IRI are syntax supplied by the serialisers. Different terms may consequently
+ * share a lexical form, which on its own does not identify a term.
+ *
+ * @param term - The term to project
+ *
+ * @returns The lexical form carried by `term`
+ *
+ * @see {@link https://www.w3.org/TR/rdf11-concepts/#dfn-lexical-form RDF 1.1 Lexical form}
+ */
+export function lexical(term: Term): string {
+
+	switch ( term.kind ) {
+
+		case "blank":
+
+			return term.label;
+
+		case "named":
+
+			return term.iri;
+
+		case "tagged":
+		case "typed":
+
+			return term.text;
+
+	}
+
+}
 
 /**
  * Replaces blank nodes in a {@link Graph} with minted named resources.

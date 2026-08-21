@@ -16,7 +16,7 @@
 
 import { xsd } from "@metreeca/core/datatype";
 import { describe, expect, test } from "vitest";
-import { blank, graph, named, rdf, rdfs, skolemize, tagged, triple, typed } from "./index.js";
+import { blank, graph, lexical, named, rdf, rdfs, skolemize, tagged, triple, typed } from "./index.js";
 
 
 const s = named("http://example.com/s");
@@ -248,6 +248,35 @@ describe("typed", () => {
 
 });
 
+
+describe("lexical", () => {
+
+	test("returns the bare label of a blank node", () => {
+
+		expect(lexical(blank("b1"))).toBe("b1");
+
+	});
+
+	test("returns the IRI of a named resource", () => {
+
+		expect(lexical(named("http://example.com/s"))).toBe("http://example.com/s");
+
+	});
+
+	test("returns the lexical form of a tagged literal, dropping the language tag", () => {
+
+		expect(lexical(tagged("hello", "en-GB"))).toBe("hello");
+
+	});
+
+	test("returns the lexical form of a typed literal, dropping the datatype", () => {
+
+		expect(lexical(typed("value"))).toBe("value");
+		expect(lexical(typed(42, xsd.integer))).toBe("42");
+
+	});
+
+});
 
 describe("skolemize", () => {
 

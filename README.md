@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@metreeca/trio)](https://www.npmjs.com/package/@metreeca/trio)
 
-A lightweight TypeScript library for RDF 1.1 data modelling, graph assembly, and serialisation.
+RDF 1.1 data modelling, graph assembly and serialisation.
 
 **@metreeca/trio** provides an RDF substrate for TypeScript applications, covering the term and graph data model,
 declarative combinators for assembling graphs from domain objects, and codecs for standard RDF serialisations. Terms and

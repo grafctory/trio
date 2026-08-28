@@ -1,7 +1,7 @@
 {
   "name": "@metreeca/trio",
   "version": "0.1.0",
-  "description": "A lightweight TypeScript library for RDF data modelling, graph assembly, and serialisation.",
+  "description": "RDF 1.1 data modelling, graph assembly and serialisation.",
   "keywords": [
     "typescript",
     "rdf",

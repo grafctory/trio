@@ -60,7 +60,7 @@ import { isTag, type Tag } from "@metreeca/core/language";
 import { createNamespace, type IRI, isIRI } from "@metreeca/core/resource";
 import { createScope } from "@metreeca/core/scope";
 import { isWellFormed } from "@metreeca/core/strings";
-import { immutable } from "@metreeca/core/structures";
+import { immutable } from "@metreeca/core/values";
 import { BLANK_NODE } from "./index.core.js";
 
 

@@ -5,12 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unpublished](https://github.com/metreeca/trio/compare/v0.1.1...HEAD)
+## [Unpublished](https://github.com/metreeca/trio/compare/v0.1.2...HEAD)
+
+## [0.1.2](https://github.com/metreeca/trio/compare/v0.1.1...v0.1.2) - 2026-10-01
 
 ### Changed
 
 - Realign to the renamed `@metreeca/core` values module, raising the minimum supported version to `0.12.0`: `immutable`
   is imported from `@metreeca/core/values` in place of `@metreeca/core/structures`
+- Raise the minimum supported Node.js version to `22.22.0`
 
 ## [0.1.1](https://github.com/metreeca/trio/releases/tag/v0.1.1) - 2026-09-09
 

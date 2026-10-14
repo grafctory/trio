@@ -26,9 +26,18 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.js",
-    "./builder": "./dist/builder.js",
-    "./ntriples": "./dist/ntriples/index.js"
+    ".": {
+      "@metreeca/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./builder": {
+      "@metreeca/source": "./src/builder.ts",
+      "default": "./dist/builder.js"
+    },
+    "./ntriples": {
+      "@metreeca/source": "./src/ntriples/index.ts",
+      "default": "./dist/ntriples/index.js"
+    }
   },
   "files": [
     "README.md",

@@ -20,9 +20,7 @@ import { createNamespace } from "@metreeca/core/resource";
 /**
  * RDF vocabulary namespace.
  *
- * Lets code refer to the terms of the RDF 1.1 vocabulary by name, so that their IRIs are neither spelled out nor
- * mistyped. The namespace is closed, covering the core classes, the container and collection vocabularies, the
- * RDF-defined datatypes, and the typing, reification and collection properties.
+ * Closed over the RDF 1.1 vocabulary.
  *
  * > [!NOTE]
  * > RDF/XML syntax terms (`RDF`, `Description`, `about`, `parseType`, and so on) are not included: they carry

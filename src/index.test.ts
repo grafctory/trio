@@ -15,8 +15,30 @@
  */
 
 import { xsd } from "@metreeca/core/datatype";
-import { describe, expect, test } from "vitest";
-import { blank, graph, lexical, named, owl, rdf, rdfs, shacl, skolemize, tagged, triple, typed } from "./index.js";
+import { describe, expect, expectTypeOf, test } from "vitest";
+import {
+	type Blank,
+	blank,
+	graph,
+	lexical,
+	type Named,
+	named,
+	type Object as RDFObject,
+	owl,
+	type Predicate,
+	rdf,
+	rdfs,
+	shacl,
+	skolemize,
+	type Subject,
+	type Tagged,
+	tagged,
+	type Term,
+	type Triple,
+	triple,
+	type Typed,
+	typed
+} from "./index.js";
 
 
 const s = named("http://example.com/s");
@@ -69,6 +91,55 @@ describe("shacl", () => {
 	test("exposes hyphenated parameter declaration IRIs", () => {
 
 		expect(shacl["AndConstraintComponent-and"]).toBe("http://www.w3.org/ns/shacl#AndConstraintComponent-and");
+
+	});
+
+});
+
+
+describe("Triple", () => {
+
+	test("types each position by its role", () => {
+
+		expectTypeOf<Triple>().toEqualTypeOf<readonly [Subject, Predicate, RDFObject]>();
+
+	});
+
+});
+
+describe("Subject", () => {
+
+	test("admits resources", () => {
+
+		expectTypeOf<Blank>().toExtend<Subject>();
+		expectTypeOf<Named>().toExtend<Subject>();
+
+	});
+
+	test("rejects literals", () => {
+
+		expectTypeOf<Tagged>().not.toExtend<Subject>();
+		expectTypeOf<Typed>().not.toExtend<Subject>();
+
+	});
+
+});
+
+describe("Predicate", () => {
+
+	test("admits named resources only", () => {
+
+		expectTypeOf<Predicate>().toEqualTypeOf<Named>();
+
+	});
+
+});
+
+describe("Object", () => {
+
+	test("admits any term", () => {
+
+		expectTypeOf<RDFObject>().toEqualTypeOf<Term>();
 
 	});
 

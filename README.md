@@ -29,11 +29,11 @@ npm install @metreeca/trio
 >
 > This section introduces essential concepts; for complete coverage, see the API reference:
 >
-> | Module                    | Description               |
-> |---------------------------|---------------------------|
-> | [@metreeca/trio]          | RDF 1.1 data model        |
-> | [@metreeca/trio/builder]  | Builders for RDF graphs.  |
-> | [@metreeca/trio/ntriples] | N-Triples codec           |
+> | Module                    | Description                                               |
+> |---------------------------|-----------------------------------------------------------|
+> | [@metreeca/trio]          | Typings for the RDF 1.1 data model                        |
+> | [@metreeca/trio/builder]  | Declarative builders for RDF graphs                       |
+> | [@metreeca/trio/ntriples] | N-Triples codec                                           |
 
 [@metreeca/trio]: https://metreeca.github.io/trio/modules/index.html
 
@@ -43,9 +43,7 @@ npm install @metreeca/trio
 
 ## Building Terms
 
-Terms are built through validating factories, each returning a frozen record: `named` boxes an absolute IRI, `blank`
-mints a document-scoped label, and `tagged` and `typed` pair a lexical form with a language tag or a datatype IRI.
-Statements assemble with `triple`, graphs with `graph`:
+Terms are built through validating factories returning frozen records, statements with `triple` and graphs with `graph`:
 
 ```typescript
 import { xsd } from "@metreeca/core/datatype";
@@ -67,11 +65,9 @@ Malformed components are rejected where the term is built, rather than escaping 
 blank-node label outside the intersection of the N-Triples, Turtle and SPARQL 1.1 grammars, a language tag outside BCP
 47, or a lexical form holding an isolated UTF-16 surrogate all throw a `RangeError`.
 
-`lexical` reads back the bare string a term carries, undecorated by serialisation syntax: the blank-node label, the
-absolute IRI, or the literal lexical form, whatever the form of the term.
+`lexical` reads back the bare string a term carries: the blank-node label, the IRI, or the literal lexical form.
 
-Blank-node identity is scoped to the document that introduced it: `skolemize` replaces every blank node of a graph with
-a minted `urn:uuid:` resource, correlating repeated labels to the same resource.
+`skolemize` replaces every blank node of a graph with a minted `urn:uuid:` resource, one per label.
 
 ## Assembling Graphs
 
@@ -132,9 +128,8 @@ await fetch(ex["graphs/products"], {
 const decoded = decodeNTriples(document);
 ```
 
-Encoding takes terms as valid, escaping rather than checking them, so a graph assembled through the factories is
-serialised as it stands. Decoding skips blank lines and comments, correlates repeated blank-node labels within the
-document, and throws a `SyntaxError` on a malformed statement; it is verified against the
+Encoding does not validate terms, relying on graphs being assembled through the factories. Decoding renumbers blank-node
+labels and throws a `SyntaxError` on a malformed statement; it is verified against the
 [W3C RDF 1.1 N-Triples syntax test suite](https://w3c.github.io/rdf-tests/rdf/rdf11/rdf-n-triples/).
 
 # Support

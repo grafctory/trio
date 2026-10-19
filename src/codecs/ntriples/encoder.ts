@@ -38,13 +38,10 @@ const IRIEscapePattern = /[\x00-\x20<>"{}|^`\\]|[\u{10000}-\u{10FFFF}]/gu;
 /**
  * Encodes an RDF {@link Graph | graph} into an {@link https://www.w3.org/TR/n-triples/ N-Triples} document.
  *
- * Emits one statement per {@link index.Triple | triple}, each terminated by ` .` and a line feed, so the empty graph
- * encodes to the empty string. A literal carrying the redundant `xsd:string` datatype collapses to the bare quoted
- * form.
+ * Literals with the `xsd:string` datatype are written in the bare quoted form.
  *
- * Terms are taken as valid: IRIs, blank-node labels, lexical forms and language tags are validated by the data model
- * factories, which are the only supported way to build a {@link Graph}, so the encoder escapes rather than checks. A
- * record assembled without them is serialised as it stands, malformed components included.
+ * Terms are not validated: a record built without the data model factories is serialised as it stands, malformed
+ * components included, so a {@link Graph} is expected to be assembled through the factories alone.
  *
  * @param graph - The graph to serialise
  *

@@ -20,13 +20,8 @@ import { createNamespace } from "@metreeca/core/resource";
 /**
  * SHACL vocabulary namespace.
  *
- * Lets code refer to the terms of the SHACL vocabulary and its extensions by name, so that shape and validation report
- * IRIs are neither spelled out nor mistyped. The namespace is closed and complete.
- *
- * The core vocabulary covers shapes and targets, node kinds, property paths, constraint parameters and components,
- * non-validating property shape characteristics, the validation report, and the constraint component metamodel with
- * its parameter declarations. The extensions cover SHACL-SPARQL, the SHACL Advanced Features (custom targets,
- * annotations, functions, node expressions, rules) and the SHACL JavaScript Extensions.
+ * Closed and complete over the SHACL vocabulary, including SHACL-SPARQL, the SHACL Advanced Features and the SHACL
+ * JavaScript Extensions, along with the parameter declarations of the built-in constraint components.
  *
  * > [!NOTE]
  * > The parameter declarations of the built-in constraint components carry hyphenated names, so they are accessed with

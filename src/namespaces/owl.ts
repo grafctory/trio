@@ -20,10 +20,7 @@ import { createNamespace } from "@metreeca/core/resource";
 /**
  * OWL vocabulary namespace.
  *
- * Lets code refer to the terms of the OWL 2 vocabulary by name, so that ontology IRIs are neither spelled out nor
- * mistyped. The namespace is closed and complete, covering the ontology header, the built-in classes and properties,
- * the entity and property kinds, the property characteristics, the class and data range expressions, the
- * restrictions, the axiom and annotation vocabularies, and the OWL-defined datatypes.
+ * Closed and complete over the OWL 2 vocabulary.
  *
  * > [!NOTE]
  * > The OWL 1 terms deprecated by OWL 2 (`DataRange`, `DeprecatedClass`, `DeprecatedProperty`) are included, as they

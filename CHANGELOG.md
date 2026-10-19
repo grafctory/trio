@@ -11,6 +11,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `owl` and `shacl` vocabulary namespaces, covering the complete OWL 2 vocabulary and the SHACL vocabulary with its
   SPARQL, Advanced Features and JavaScript extensions
+- `Subject`, `Predicate` and `Object` types for the terms admitted in each `Triple` position, used by `triple` and by
+  the `@metreeca/trio/builder` combinators in place of the inline `Blank | Named` unions
 
 ### Changed
 

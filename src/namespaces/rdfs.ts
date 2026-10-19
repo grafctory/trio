@@ -20,9 +20,7 @@ import { createNamespace } from "@metreeca/core/resource";
 /**
  * RDFS vocabulary namespace.
  *
- * Lets code refer to the terms of the RDF Schema 1.1 vocabulary by name, so that their IRIs are neither spelled out
- * nor mistyped. The namespace is closed and complete, covering the schema classes, the class and property hierarchy
- * relations, the property signature relations, the annotation properties, and the container membership shorthand.
+ * Closed and complete over the RDF Schema 1.1 vocabulary.
  *
  * @see {@link https://www.w3.org/TR/rdf-schema/ RDF Schema 1.1}
  */

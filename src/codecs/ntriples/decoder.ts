@@ -17,7 +17,7 @@
 import { immutable } from "@metreeca/core/values";
 import { createScope } from "@metreeca/core/scope";
 import { BLANK_NODE } from "../../index.core.js";
-import { type Blank, blank, type Graph, type Named, named, tagged, type Term, typed } from "../../index.js";
+import { blank, type Graph, type Named, named, type Subject, tagged, type Term, typed } from "../../index.js";
 
 
 //// Terminals /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,16 +256,11 @@ const Escapes: Record<string, string> = immutable({
 /**
  * Decodes an {@link https://www.w3.org/TR/n-triples/ N-Triples} document into its RDF {@link Graph | graph}.
  *
- * Decodes each statement line to one {@link index.Triple | triple}, skipping blank lines and `#` comments, so a
- * document carrying no statements decodes to the empty graph. Blank-node subjects and objects (`_:bX`) decode to
- * scope-numbered {@link index.Blank | Blank} nodes: a per-document {@link createScope | scope} keyed by the external
- * label mints one node per distinct label, numbered by a short sequential id, so repeats of one label correlate to
- * the same node within the document.
+ * Blank-node labels are not preserved: each distinct label is renumbered with a short sequential id.
  *
  * > [!WARNING]
- * > External labels are read against the intersection of the N-Triples, Turtle and SPARQL 1.1 `BLANK_NODE_LABEL`
- * > productions, so that every decoded label is one the {@link index.blank | blank} factory accepts; a label
- * > carrying `:`, which only N-Triples admits, is consequently rejected as malformed.
+ * > A blank-node label carrying `:` is rejected as malformed, although N-Triples admits it: labels are read against
+ * > the intersection of the N-Triples, Turtle and SPARQL 1.1 grammars, as the {@link index.blank | blank} factory is.
  *
  * @param value - The N-Triples document to decode
  *
@@ -311,7 +306,7 @@ export function decodeNTriples(value: string): Graph {
 	});
 
 
-	function resource(token: string): Blank | Named {
+	function resource(token: string): Subject {
 
 		return token.startsWith("_:")
 			? blanks.resolve(token.slice(2))
@@ -391,10 +386,7 @@ export function decodeNTriples(value: string): Graph {
 	}
 
 	/**
-	 * Reports whether a code point falls within the UTF-16 surrogate range.
-	 *
-	 * Code points from U+D800 to U+DFFF are reserved for the halves of a surrogate pair and denote no character on
-	 * their own, so a `UCHAR` escape resolving to one denotes no character either.
+	 * Tests whether a code point falls within the UTF-16 surrogate range.
 	 */
 	function isSurrogate(code: number): boolean {
 		return code >= 0xD800 && code <= 0xDFFF;

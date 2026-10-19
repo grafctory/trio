@@ -15,9 +15,7 @@
  */
 
 /**
- * Builders for RDF graphs.
- *
- * Provides declarative combinators that map domain resources to the RDF {@link Graph | graphs} representing them.
+ * Declarative builders for RDF graphs.
  *
  * **Types**
  *
@@ -25,11 +23,9 @@
  *
  * **Combinators**
  *
- * - {@link resource} — builds a resource graph anchored at a chosen subject, threading it into a builder callback and
- *   checking every built statement hangs off it
- * - {@link description} — builds a resource description by concatenating per-property graphs
- * - {@link property} — links subjects to objects under a predicate, taking objects either as ready
- *   {@link Term | terms} or as values run through a {@link Mapper} and embedded at their own root
+ * - {@link resource} — builds a resource graph anchored at a subject
+ * - {@link description} — concatenates per-property graphs
+ * - {@link property} — links subjects to objects, given as terms or as values run through a {@link Mapper}
  *
  * **Term encoders**
  *
@@ -40,8 +36,7 @@
  *
  * **Usage**
  *
- * Every combinator returns a {@link Graph}, so a resource and its embedded sub-resources assemble as one nested
- * expression:
+ * Every combinator returns a {@link Graph}, so a resource and its sub-resources nest into one expression:
  *
  * ```ts
  * const ex = createNamespace("https://example.org/");
@@ -74,11 +69,11 @@ import { some, type Some } from "@metreeca/core/arrays";
 import { type Tag } from "@metreeca/core/language";
 import { type IRI } from "@metreeca/core/resource";
 import {
-	type Blank,
 	blank,
 	type Graph,
 	type Named,
 	named,
+	type Subject,
 	type Tagged,
 	tagged,
 	type Term,
@@ -88,11 +83,9 @@ import {
 
 
 /**
- * Maps a domain value to its RDF rendering: either a single {@link Term} or a whole {@link Graph}.
+ * Maps a domain value to its RDF rendering.
  *
- * How each rendering is consumed is the caller's concern: {@link property} takes a {@link Term} as a direct triple
- * object and a {@link Graph} as a sub-resource linked at its own root. A mapper is otherwise a plain value-to-graph
- * function, free to mint its own blank-node anchors and never handed one by the caller.
+ * A mapper is never handed an anchor: a graph rendering mints its own root, typically a fresh blank node.
  *
  * @typeParam T - The domain value being mapped
  */
@@ -102,27 +95,19 @@ export type Mapper<T> = (value: T) => Term | Graph;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Builds a resource graph anchored at a chosen subject.
+ * Builds a resource graph anchored at a subject.
  *
- * Passes `subject` to `builder`, boxing a bare IRI through {@link named} first, and returns the {@link Graph} it
- * produces, checked to hang off that subject. The subject is the caller's to choose: a {@link Named | named resource}
- * for an identified one, or a {@link blank | blank node} for an anonymous embedded one. An empty built graph is a
- * no-op, returned as it is: a resource whose properties are all absent contributes no statements and has nothing to
- * anchor.
+ * An empty built graph is returned as is.
  *
  * > [!IMPORTANT]
  * > Every triple of a non-empty built graph must be reachable from `subject`, walking statements in either direction
- * > through their resource positions: an inverse statement pointing back at the subject keeps its own subtree
- * > anchored just as a direct one does. Literals carry no identity and are never walked through, so triples sharing
- * > a literal value stay unconnected. The two ways a graph fails to hang off `subject` are reported apart rather than
- * > returned half-anchored:
+ * > through resources only: inverse statements are anchored like direct ones, while triples sharing just a literal
+ * > value stay unconnected. A graph failing the check is rejected with one of two errors:
  * >
- * > - **missing** — no triple names `subject`, in either position, the typical mark of a builder ignoring the subject
- * >   threaded into it;
- * > - **detached** — some triples name `subject`, but others are stranded out of its reach (reported as disjoint).
+ * > - **missing** — no triple mentions `subject`, typically a builder ignoring it;
+ * > - **detached** — some triples are out of reach of `subject` (reported as disjoint).
  *
- * @param subject - The subject the built properties hang off, as a ready {@link Blank | blank node} or
- * 		{@link Named | named resource}, or the IRI standing for a named one
+ * @param subject - The subject the built properties hang off: a ready {@link Subject}, or the IRI of a named one
  * @param builder - Builds the resource graph anchored at `subject`
  *
  * @returns The assembled resource graph
@@ -130,7 +115,7 @@ export type Mapper<T> = (value: T) => Term | Graph;
  * @throws RangeError if `subject` is a relative or otherwise malformed IRI, or if the built graph is non-empty and
  * 		either leaves `subject` unmentioned or strands triples away from it
  */
-export function resource(subject: IRI | Blank | Named, builder: (subject: Blank | Named) => Graph): Graph {
+export function resource(subject: IRI | Subject, builder: (subject: Subject) => Graph): Graph {
 
 	const root = isString(subject) ? named(subject) : subject;
 	const graph = builder(root);
@@ -158,8 +143,7 @@ export function description(...properties: readonly Graph[]): Graph {
 /**
  * Builds direct triples linking each subject to each object term.
  *
- * Every subject/object pair yields one direct triple, the object taken as an RDF {@link Term}. The predicate, and any
- * object supplied as a bare IRI, are boxed through {@link named}.
+ * One triple is built for each subject/object pair.
  *
  * @param subject - The subject(s) the statements hang off
  * @param predicate - The predicate IRI shared by every emitted statement
@@ -169,27 +153,20 @@ export function description(...properties: readonly Graph[]): Graph {
  *
  * @throws RangeError if `predicate`, or an object supplied as a bare IRI, is relative or otherwise malformed
  */
-export function property(subject: Some<Blank | Named>, predicate: IRI, objects: Some<IRI | Term>): Graph;
+export function property(subject: Some<Subject>, predicate: IRI, objects: Some<IRI | Term>): Graph;
 
 /**
  * Builds triples by {@link Mapper | mapping} each object, embedding sub-graphs at their root.
  *
- * Each object is run through `mapper`: a {@link Term} result becomes a direct triple object, while a {@link Graph}
- * result is embedded as a sub-resource and linked at its own root. That root is derived structurally rather than
- * supplied: the single source-only subject the encoded graph hangs off, letting encoders self-root their output at a
- * fresh blank node and freeing callers from threading anchors. An empty encoded graph contributes no triples.
+ * A term result becomes the triple object; a graph result is embedded and linked at its root, unless empty.
  *
  * > [!IMPORTANT]
- * > A {@link Graph} returned by `mapper` must hang off a single root: exactly one subject is source-only, never
- * > appearing in object position, and every triple is reachable from it. Reachability is all that is asked for, not a
- * > tree shape: branches merging back into a shared node link like any other. Inverse statements are welcome deeper
- * > inside the graph but must not point back at its root, which any incoming statement disqualifies, leaving the graph
- * > rooted elsewhere or not at all. The shapes leaving no such root throw rather than being silently mislinked:
+ * > A graph returned by `mapper` must hang off a single root: exactly one subject never appears in object position,
+ * > and every triple is reachable from it. Graphs failing the check are rejected as:
  * >
- * > - **cyclic** — every subject appears in object position, leaving no source-only one (reported as a missing root);
- * > - **multi-rooted** — independent components each contribute a source-only subject (reported as disjoint);
- * > - **detached** — a single root is left, but cyclic components strand triples out of its reach (reported as
- * >   disjoint).
+ * > - **cyclic** — every subject appears in object position (reported as a missing root);
+ * > - **multi-rooted** — several subjects never appear in object position (reported as disjoint);
+ * > - **detached** — a single root is left, but cyclic components are out of its reach (reported as disjoint).
  *
  * @typeParam V - The domain value type accepted by `mapper`
  *
@@ -203,12 +180,12 @@ export function property(subject: Some<Blank | Named>, predicate: IRI, objects: 
  * @throws RangeError On an encoded graph not hanging off a single root subject, whether cyclic, multi-rooted or
  *     detached
  */
-export function property<V>(subject: Some<Blank | Named>, predicate: IRI, objects: Some<V>, mapper: Mapper<V>): Graph;
+export function property<V>(subject: Some<Subject>, predicate: IRI, objects: Some<V>, mapper: Mapper<V>): Graph;
 
 /**
  * Builds direct triples, or {@link Mapper | maps} each object and embeds sub-graphs at their root.
  */
-export function property<V>(subject: Some<Blank | Named>, predicate: IRI, objects: Some<V>, mapper?: Mapper<V>): Graph {
+export function property<V>(subject: Some<Subject>, predicate: IRI, objects: Some<V>, mapper?: Mapper<V>): Graph {
 
 	if ( mapper ) {
 
@@ -268,9 +245,7 @@ export function data(data: Some<Scalar>, datatype?: IRI): readonly Typed[] {
 /**
  * Encodes a language map as language-tagged or plain literals.
  *
- * > [!IMPORTANT]
- * > By convention the `und` (undetermined) tag yields a plain {@link Typed} literal; every other tag yields a
- * > language-{@link Tagged} literal.
+ * The `und` (undetermined) tag yields a plain `xsd:string` literal instead of a language-tagged one.
  *
  * @param text - The tag-to-content map(s) to encode
  *
@@ -289,9 +264,6 @@ export function text(text: Some<{ [tag: Tag]: Some<string> }>): readonly (Tagged
 
 /**
  * Maps each value of a {@link Some} input through an encoder into RDF terms.
- *
- * The shared spine of {@link link} and {@link data}: normalises the input to an array and applies `encoder`
- * elementwise.
  *
  * @typeParam V - The source value type
  * @typeParam T - The {@link Term} subtype produced by `encoder`
@@ -312,8 +284,6 @@ export function term<V, T extends Term>(source: Some<V>, encoder: (value: V) => 
 
 /**
  * Tests whether a {@link Mapper} result is a single {@link Term} rather than a {@link Graph}.
- *
- * Discriminates on array-ness, the sole structural difference: a graph is an array of triples, every term form is not.
  */
 function isTerm(value: Term | Graph): value is Term {
 
@@ -324,17 +294,13 @@ function isTerm(value: Term | Graph): value is Term {
 /**
  * Finds the root subject an embedded graph hangs off: the single subject that never appears in object position.
  *
- * Collects every subject that is not also used as an object, a well-formed graph leaving exactly one, then checks the
- * whole graph to be {@link connected} to that root. The {@link property} encoded overload documents the single-root
- * constraint and its cyclic, multi-rooted and detached failure modes.
- *
  * @param graph - The non-empty embedded graph to root
  *
  * @returns The graph's unique root subject
  *
  * @throws RangeError On a graph not hanging off a single root subject, whether cyclic, multi-rooted or detached
  */
-function anchor(graph: Graph): Blank | Named {
+function anchor(graph: Graph): Subject {
 
 	const objects = new Set(graph.map(([, , object]) => key(object)));
 	const subjects = new Map(graph.map(([subject]) => [key(subject), subject]));
@@ -361,16 +327,12 @@ function anchor(graph: Graph): Blank | Named {
 /**
  * Tests whether a graph mentions a resource at all, in either subject or object position.
  *
- * Separates the two ways a graph can fail to hang off a root: one that never names it at all, typically a builder
- * ignoring the subject threaded into it, and one that names it but strands triples away from it, reported by
- * {@link connected}.
- *
  * @param graph - The graph to test
  * @param root - The resource to look for
  *
  * @returns true if some triple of `graph` carries `root` as its subject or object; false otherwise
  */
-function mentions(graph: Graph, root: Blank | Named): boolean {
+function mentions(graph: Graph, root: Subject): boolean {
 
 	return graph.some(([subject, , object]) => key(subject) === key(root) || key(object) === key(root));
 
@@ -379,18 +341,12 @@ function mentions(graph: Graph, root: Blank | Named): boolean {
 /**
  * Tests whether every triple of a graph hangs off a root resource.
  *
- * Grows the set of resources reached from `root` until it stops growing, walking statements in either direction: a
- * triple joins its subject to its object whenever the object is itself a resource, so an inverse statement anchors its
- * subject just as a direct one anchors its object. Literals are left out of the walk, being leaves that carry no
- * identity: two subjects stating the same literal value stay disjoint. A graph is connected when every triple has its
- * subject among the reached resources, the empty graph vacuously so.
- *
  * @param graph - The graph to test
  * @param root - The resource the graph is expected to hang off
  *
  * @returns true if every triple of `graph` is reachable from `root`; false otherwise
  */
-function connected(graph: Graph, root: Blank | Named): boolean {
+function connected(graph: Graph, root: Subject): boolean {
 
 	const links = graph.filter(([, , object]) => object.kind === "blank" || object.kind === "named");
 
@@ -416,8 +372,7 @@ function connected(graph: Graph, root: Blank | Named): boolean {
 /**
  * Computes the key identifying a {@link Term} within a graph.
  *
- * Renders the term into the token standing for it, so graph positions are matched by value: terms are boxed records,
- * and two occurrences of one node are equal without being the same reference.
+ * Terms are records, so graph positions are matched by key rather than by reference.
  *
  * @param term - The term to key
  *

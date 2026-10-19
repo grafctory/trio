@@ -35,8 +35,8 @@
       "default": "./dist/builder.js"
     },
     "./ntriples": {
-      "@metreeca/source": "./src/ntriples/index.ts",
-      "default": "./dist/ntriples/index.js"
+      "@metreeca/source": "./src/codecs/ntriples/index.ts",
+      "default": "./dist/codecs/ntriples/index.js"
     }
   },
   "files": [

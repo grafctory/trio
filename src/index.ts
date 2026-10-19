@@ -17,39 +17,14 @@
 /**
  * RDF 1.1 data model.
  *
- * Defines the RDF 1.1 terms and statements making up an RDF graph, together with the factories that construct
- * well-formed ones, alongside the standard vocabulary namespaces the model is described with.
+ * Defines the terms and statements that make up an RDF graph. Factories build only well-formed terms, rejecting a
+ * malformed IRI, blank-node label, language tag or lexical form where the term is created. Utilities read back the
+ * lexical form of any term and replace the document-scoped blank nodes of a graph with minted named resources.
  *
- * **Vocabularies**
+ * The standard RDF, RDFS, OWL and SHACL vocabularies are exposed as closed namespaces, so that their terms are referred
+ * to by name rather than spelled out as IRIs, with typos caught at compile time.
  *
- * - {@link rdf} — RDF vocabulary namespace
- * - {@link rdfs} — RDFS vocabulary namespace
- *
- * **Data model**
- *
- * - {@link Graph} — flat sequence of {@link Triple | triples}
- * - {@link Triple} — ground subject/predicate/object statement
- * - {@link Term} — RDF term: a blank node, a named resource, or a literal
- * - {@link Blank} — blank node, as a document-scoped label
- * - {@link Named} — named resource, as an absolute IRI
- * - {@link Tagged} — language-tagged literal
- * - {@link Typed} — datatype-typed literal
- *
- * **Factories**
- *
- * - {@link graph} — construct a {@link Graph}
- * - {@link triple} — construct a {@link Triple}
- * - {@link blank} — construct a {@link Blank | blank node}
- * - {@link named} — construct a {@link Named | named resource}
- * - {@link tagged} — construct a {@link Tagged} literal
- * - {@link typed} — construct a {@link Typed} literal
- *
- * **Utilities**
- *
- * - {@link lexical} — retrieve the lexical form of a {@link Term}
- * - {@link skolemize} — replace a {@link Graph | graph}'s blank nodes with minted named resources
- *
- * @module
+ * @module index
  *
  * @see {@link https://www.w3.org/TR/rdf11-concepts/ RDF 1.1 Concepts and Abstract Syntax}
  */
@@ -57,7 +32,7 @@
 import { error, isNumber, isString, type Scalar } from "@metreeca/core";
 import { xsd } from "@metreeca/core/datatype";
 import { isTag, type Tag } from "@metreeca/core/language";
-import { createNamespace, type IRI, isIRI } from "@metreeca/core/resource";
+import { type IRI, isIRI } from "@metreeca/core/resource";
 import { createScope } from "@metreeca/core/scope";
 import { isWellFormed } from "@metreeca/core/strings";
 import { immutable } from "@metreeca/core/values";
@@ -74,81 +49,10 @@ const BlankPattern = new RegExp(`^${BLANK_NODE}$`, "u");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * RDF vocabulary namespace.
- *
- * A closed namespace of the RDF 1.1 vocabulary IRIs, covering the core classes, the container and collection
- * vocabularies, the RDF-defined datatypes, and the typing, reification and collection properties.
- *
- * > [!NOTE]
- * > RDF/XML syntax terms (`RDF`, `Description`, `about`, `parseType`, and so on) are not included: they carry
- * > document-serialisation semantics of little use as standalone vocabulary identifiers. The open-ended container
- * > membership properties (`_1`, `_2`, …) are likewise omitted, as they cannot be enumerated.
- *
- * @see {@link https://www.w3.org/TR/rdf11-concepts/ RDF 1.1 Concepts and Abstract Syntax}
- */
-export const rdf = createNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#", [
-
-	"Property",
-	"Statement",
-
-	"Bag",
-	"Seq",
-	"Alt",
-
-	"List",
-	"nil",
-
-	"XMLLiteral",
-	"HTML",
-	"langString",
-
-	"type",
-
-	"subject",
-	"predicate",
-	"object",
-
-	"value",
-
-	"first",
-	"rest"
-
-]);
-
-/**
- * RDFS vocabulary namespace.
- *
- * A closed namespace of the complete RDF Schema 1.1 vocabulary IRIs, covering the schema classes, the class and
- * property hierarchy relations, the property signature relations, the annotation properties, and the container
- * membership shorthand.
- *
- * @see {@link https://www.w3.org/TR/rdf-schema/ RDF Schema 1.1}
- */
-export const rdfs = createNamespace("http://www.w3.org/2000/01/rdf-schema#", [
-
-	"Resource",
-	"Class",
-	"Literal",
-	"Datatype",
-	"Container",
-	"ContainerMembershipProperty",
-
-	"subClassOf",
-	"subPropertyOf",
-
-	"domain",
-	"range",
-
-	"label",
-	"comment",
-
-	"seeAlso",
-	"isDefinedBy",
-
-	"member"
-
-]);
+export { rdf } from "./namespaces/rdf.js";
+export { rdfs } from "./namespaces/rdfs.js";
+export { owl } from "./namespaces/owl.js";
+export { shacl } from "./namespaces/shacl.js";
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

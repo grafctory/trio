@@ -16,7 +16,7 @@
 
 import { xsd } from "@metreeca/core/datatype";
 import { escape } from "@metreeca/core/strings";
-import { type Blank, type Graph, type Named, type Tagged, type Term, type Typed } from "../index.js";
+import { type Blank, type Graph, type Named, type Tagged, type Term, type Typed } from "../../index.js";
 
 
 /**

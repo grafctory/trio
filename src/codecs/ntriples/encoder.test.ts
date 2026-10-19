@@ -15,7 +15,7 @@
  */
 
 import { describe, expect, test } from "vitest";
-import { blank, named, type Named, tagged, typed } from "../index.js";
+import { blank, named, type Named, tagged, typed } from "../../index.js";
 import { encodeNTriples } from "./encoder.js";
 
 

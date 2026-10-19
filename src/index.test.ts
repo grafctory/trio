@@ -16,7 +16,7 @@
 
 import { xsd } from "@metreeca/core/datatype";
 import { describe, expect, test } from "vitest";
-import { blank, graph, lexical, named, rdf, rdfs, skolemize, tagged, triple, typed } from "./index.js";
+import { blank, graph, lexical, named, owl, rdf, rdfs, shacl, skolemize, tagged, triple, typed } from "./index.js";
 
 
 const s = named("http://example.com/s");
@@ -41,6 +41,34 @@ describe("rdfs", () => {
 
 		expect(rdfs.label).toBe("http://www.w3.org/2000/01/rdf-schema#label");
 		expect(rdfs.subClassOf).toBe("http://www.w3.org/2000/01/rdf-schema#subClassOf");
+
+	});
+
+});
+
+describe("owl", () => {
+
+	test("exposes the OWL vocabulary IRIs", () => {
+
+		expect(owl.Class).toBe("http://www.w3.org/2002/07/owl#Class");
+		expect(owl.sameAs).toBe("http://www.w3.org/2002/07/owl#sameAs");
+
+	});
+
+});
+
+describe("shacl", () => {
+
+	test("exposes the SHACL vocabulary IRIs", () => {
+
+		expect(shacl.NodeShape).toBe("http://www.w3.org/ns/shacl#NodeShape");
+		expect(shacl.path).toBe("http://www.w3.org/ns/shacl#path");
+
+	});
+
+	test("exposes hyphenated parameter declaration IRIs", () => {
+
+		expect(shacl["AndConstraintComponent-and"]).toBe("http://www.w3.org/ns/shacl#AndConstraintComponent-and");
 
 	});
 

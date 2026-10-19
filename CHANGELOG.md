@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.0](https://github.com/metreeca/trio/compare/v0.1.3...HEAD)
 
+### Added
+
+- `owl` and `shacl` vocabulary namespaces, covering the complete OWL 2 vocabulary and the SHACL vocabulary with its
+  SPARQL, Advanced Features and JavaScript extensions
+
 ### Changed
 
 - Upgrade `@metreeca/core` to `^0.13.0`

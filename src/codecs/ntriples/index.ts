@@ -17,7 +17,7 @@
 /**
  * N-Triples codec for the RDF {@link index.Graph | Graph} model.
  *
- * @module
+ * @module ntriples
  *
  * @see {@link https://www.w3.org/TR/n-triples/ RDF 1.1 N-Triples}
  */

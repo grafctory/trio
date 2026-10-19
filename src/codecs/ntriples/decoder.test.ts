@@ -16,7 +16,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { blank, named, tagged, typed } from "../index.js";
+import { blank, named, tagged, typed } from "../../index.js";
 import { decodeNTriples } from "./decoder.js";
 
 

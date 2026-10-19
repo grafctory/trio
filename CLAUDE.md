@@ -37,6 +37,13 @@ package.
 > resolve to the published releases recorded in the lockfile. Run `setup` for local development against unpublished
 > sibling branches: imports resolve to the working copies in the neighbouring repositories.
 
+# Documentation Scope
+
+> [!CAUTION]
+> **Consumers are assumed to know RDF 1.1 and its serialisations.** Docs state only what this package decides on top
+> of the specs (validation rules, storage choices, renumbering, failure modes) and link the spec for the rest. Never
+> restate RDF semantics, the union members a type already spells out, or the factory that builds a type.
+
 # Documentation Synchronization
 
 The following descriptions must be kept in sync:

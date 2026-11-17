@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.3.0](https://github.com/metreeca/trio/compare/v0.2.0...HEAD)
 
+### Changed
+
+- **Breaking**: Upgrade `@metreeca/core` to `^0.14.0`; projects using Core alongside this package raise their own
+  `@metreeca/core` dependency to `^0.14.0` as well, so that both packages share a single copy of Core
+
 ## [0.2.0](https://github.com/metreeca/trio/compare/v0.1.3...v0.2.0) - 2026-10-19
 
 ### Added

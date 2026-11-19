@@ -53,7 +53,7 @@
     "setup": "npm ci && ush ln",
     "build": "ush rm dist docs && tsc -p tsconfig.build.json && npx typedoc",
     "check": "npx vitest --typecheck run",
-    "proof": "npx typedoc --watch & ush ws --open docs"
+    "proof": "ush up npx typedoc --watch + ush ws --open docs"
   },
   "dependencies": {
     "@metreeca/core": "^0.14.0"

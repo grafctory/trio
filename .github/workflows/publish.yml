@@ -42,5 +42,8 @@ jobs:
       - name: Test
         run: npm run check
 
+      - name: Check packages
+        run: npx ush qc
+
       - name: Publish
         run: npm publish --access public

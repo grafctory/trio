@@ -1,5 +1,5 @@
 {
-  "name": "@metreeca/trio",
+  "name": "@grafctory/trio",
   "version": "0.3.1",
   "description": "RDF 1.1 data modelling, graph assembly and serialisation.",
   "keywords": [
@@ -8,9 +8,9 @@
     "linked-data",
     "semantic-web"
   ],
-  "homepage": "https://metreeca.github.io/trio/",
+  "homepage": "https://grafctory.github.io/trio/",
   "bugs": {
-    "url": "https://github.com/metreeca/trio/issues",
+    "url": "https://github.com/grafctory/trio/issues",
     "email": "info@metreeca.com"
   },
   "license": "Apache-2.0",
@@ -21,21 +21,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/metreeca/trio.git"
+    "url": "git+https://github.com/grafctory/trio.git"
   },
   "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
-      "@metreeca/source": "./src/index.ts",
+      "@grafctory/source": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./builder": {
-      "@metreeca/source": "./src/builder.ts",
+      "@grafctory/source": "./src/builder.ts",
       "default": "./dist/builder.js"
     },
     "./ntriples": {
-      "@metreeca/source": "./src/codecs/ntriples/index.ts",
+      "@grafctory/source": "./src/codecs/ntriples/index.ts",
       "default": "./dist/codecs/ntriples/index.js"
     }
   },
@@ -56,10 +56,10 @@
     "proof": "ush up npx typedoc --watch + ush ws --open docs"
   },
   "dependencies": {
-    "@metreeca/core": "^0.14.0"
+    "@grafctory/core": "^0.14.0"
   },
   "devDependencies": {
-    "@metreeca/rack": "^0.8.0",
+    "@grafctory/rack": "^0.8.0",
     "@types/node": "^26.1.1",
     "typedoc": "^0.28.14",
     "typescript": "^6.0.3",

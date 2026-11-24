@@ -6,8 +6,8 @@
     "src/codecs/ntriples/index.ts"
   ],
   "externalSymbolLinkMappings": {
-    "@metreeca/core": {
-      "*": "https://metreeca.github.io/core/"
+    "@grafctory/core": {
+      "*": "https://grafctory.github.io/core/"
     }
   },
   "includeVersion": true,
@@ -28,7 +28,7 @@
   "sourceLinkExternal": true,
   "markdownLinkExternal": true,
   "navigationLinks": {
-    "GitHub": "https://github.com/metreeca/trio"
+    "GitHub": "https://github.com/grafctory/trio"
   },
   "githubPages": false,
   "hideGenerator": true,

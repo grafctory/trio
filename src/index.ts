@@ -27,13 +27,13 @@
  * @see {@link https://www.w3.org/TR/rdf11-concepts/ RDF 1.1 Concepts and Abstract Syntax}
  */
 
-import { error, isNumber, isString, type Scalar } from "@metreeca/core";
-import { xsd } from "@metreeca/core/datatype";
-import { isTag, type Tag } from "@metreeca/core/language";
-import { type IRI, isIRI } from "@metreeca/core/resource";
-import { createScope } from "@metreeca/core/scope";
-import { isWellFormed } from "@metreeca/core/strings";
-import { immutable } from "@metreeca/core/values";
+import { error, isNumber, isString, type Scalar } from "@grafctory/core";
+import { xsd } from "@grafctory/core/datatype";
+import { isTag, type Tag } from "@grafctory/core/language";
+import { type IRI, isIRI } from "@grafctory/core/resource";
+import { createScope } from "@grafctory/core/scope";
+import { isWellFormed } from "@grafctory/core/strings";
+import { immutable } from "@grafctory/core/values";
 import { BLANK_NODE } from "./index.core.js";
 
 

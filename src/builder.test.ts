@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { xsd } from "@metreeca/core/datatype";
+import { xsd } from "@grafctory/core/datatype";
 import { describe, expect, test } from "vitest";
 import { data, description, link, property, resource, term, text } from "./builder.js";
 import { blank, graph, named, tagged, triple, typed } from "./index.js";

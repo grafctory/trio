@@ -64,10 +64,10 @@
  * @see {@link https://www.w3.org/TR/rdf11-concepts/ RDF 1.1 Concepts}
  */
 
-import { error, isString, type Scalar } from "@metreeca/core";
-import { some, type Some } from "@metreeca/core/arrays";
-import { type Tag } from "@metreeca/core/language";
-import { type IRI } from "@metreeca/core/resource";
+import { error, isString, type Scalar } from "@grafctory/core";
+import { some, type Some } from "@grafctory/core/arrays";
+import { type Tag } from "@grafctory/core/language";
+import { type IRI } from "@grafctory/core/resource";
 import {
 	blank,
 	type Graph,

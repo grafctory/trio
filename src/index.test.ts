@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { xsd } from "@metreeca/core/datatype";
+import { xsd } from "@grafctory/core/datatype";
 import { describe, expect, expectTypeOf, test } from "vitest";
 import {
 	type Blank,

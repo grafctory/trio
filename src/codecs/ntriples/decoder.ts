@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { immutable } from "@metreeca/core/values";
-import { createScope } from "@metreeca/core/scope";
+import { immutable } from "@grafctory/core/values";
+import { createScope } from "@grafctory/core/scope";
 import { BLANK_NODE } from "../../index.core.js";
 import { blank, type Graph, type Named, named, type Subject, tagged, type Term, typed } from "../../index.js";
 

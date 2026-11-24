@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { xsd } from "@metreeca/core/datatype";
-import { escape } from "@metreeca/core/strings";
+import { xsd } from "@grafctory/core/datatype";
+import { escape } from "@grafctory/core/strings";
 import { type Blank, type Graph, type Named, type Tagged, type Term, type Typed } from "../../index.js";
 
 

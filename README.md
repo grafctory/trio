@@ -1,10 +1,10 @@
-# @metreeca/trio
+# @grafctory/trio
 
-[![npm](https://img.shields.io/npm/v/@metreeca/trio)](https://www.npmjs.com/package/@metreeca/trio)
+[![npm](https://img.shields.io/npm/v/@grafctory/trio)](https://www.npmjs.com/package/@grafctory/trio)
 
 RDF 1.1 data modelling, graph assembly and serialisation.
 
-**@metreeca/trio** provides an RDF substrate for TypeScript applications, covering the term and graph data model,
+**@grafctory/trio** provides an RDF substrate for TypeScript applications, covering the term and graph data model,
 declarative combinators for assembling graphs from domain objects, and codecs for standard RDF serialisations. Terms and
 graphs are built through validating factories and combinators, so that nothing malformed reaches a serialisation:
 
@@ -15,7 +15,7 @@ graphs are built through validating factories and combinators, so that nothing m
 # Installation
 
 ```shell
-npm install @metreeca/trio
+npm install @grafctory/trio
 ```
 
 > [!WARNING]
@@ -31,24 +31,24 @@ npm install @metreeca/trio
 >
 > | Module                    | Description                                               |
 > |---------------------------|-----------------------------------------------------------|
-> | [@metreeca/trio]          | Typings for the RDF 1.1 data model                        |
-> | [@metreeca/trio/builder]  | Declarative builders for RDF graphs                       |
-> | [@metreeca/trio/ntriples] | N-Triples codec                                           |
+> | [@grafctory/trio]          | Typings for the RDF 1.1 data model                        |
+> | [@grafctory/trio/builder]  | Declarative builders for RDF graphs                       |
+> | [@grafctory/trio/ntriples] | N-Triples codec                                           |
 
-[@metreeca/trio]: https://metreeca.github.io/trio/modules/index.html
+[@grafctory/trio]: https://grafctory.github.io/trio/modules/index.html
 
-[@metreeca/trio/builder]: https://metreeca.github.io/trio/modules/builder.html
+[@grafctory/trio/builder]: https://grafctory.github.io/trio/modules/builder.html
 
-[@metreeca/trio/ntriples]: https://metreeca.github.io/trio/modules/ntriples.html
+[@grafctory/trio/ntriples]: https://grafctory.github.io/trio/modules/ntriples.html
 
 ## Building Terms
 
 Terms are built through validating factories returning frozen records, statements with `triple` and graphs with `graph`:
 
 ```typescript
-import { xsd } from "@metreeca/core/datatype";
-import { createNamespace } from "@metreeca/core/resource";
-import { graph, named, rdf, tagged, triple, typed } from "@metreeca/trio";
+import { xsd } from "@grafctory/core/datatype";
+import { createNamespace } from "@grafctory/core/resource";
+import { graph, named, rdf, tagged, triple, typed } from "@grafctory/trio";
 
 const ex = createNamespace("https://example.org/");
 
@@ -71,15 +71,15 @@ blank-node label outside the intersection of the N-Triples, Turtle and SPARQL 1.
 
 ## Assembling Graphs
 
-The [@metreeca/trio/builder] module maps domain objects to the graphs representing them: `resource` anchors a
+The [@grafctory/trio/builder] module maps domain objects to the graphs representing them: `resource` anchors a
 description at a chosen subject, `description` concatenates per-property graphs, and `property` links subjects to
 objects, taken either as ready terms or as values run through a mapper and embedded at their own root:
 
 ```typescript
-import { xsd } from "@metreeca/core/datatype";
-import { createNamespace } from "@metreeca/core/resource";
-import { blank, type Graph, named, rdf } from "@metreeca/trio";
-import { data, description, link, property, resource, text } from "@metreeca/trio/builder";
+import { xsd } from "@grafctory/core/datatype";
+import { createNamespace } from "@grafctory/core/resource";
+import { blank, type Graph, named, rdf } from "@grafctory/trio";
+import { data, description, link, property, resource, text } from "@grafctory/trio/builder";
 
 const ex = createNamespace("https://example.org/");
 
@@ -109,11 +109,11 @@ instead of being silently mislinked.
 
 ## Reading and Writing N-Triples
 
-The [@metreeca/trio/ntriples] module decodes and encodes [N-Triples](https://www.w3.org/TR/n-triples/) documents,
+The [@grafctory/trio/ntriples] module decodes and encodes [N-Triples](https://www.w3.org/TR/n-triples/) documents,
 alongside the `NTriples` media type for content negotiation:
 
 ```typescript
-import { decodeNTriples, encodeNTriples, NTriples } from "@metreeca/trio/ntriples";
+import { decodeNTriples, encodeNTriples, NTriples } from "@grafctory/trio/ntriples";
 
 const document = encodeNTriples(statements);
 
@@ -134,10 +134,10 @@ labels and throws a `SyntaxError` on a malformed statement; it is verified again
 
 # Support
 
-- open an [issue](https://github.com/metreeca/trio/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/trio/discussions) to ask a how-to question or to share an idea
+- open an [issue](https://github.com/grafctory/trio/issues) to report a problem or to suggest a new feature
+- start a [discussion](https://github.com/grafctory/trio/discussions) to ask a how-to question or to share an idea
 
 # License
 
 This project is licensed under the Apache 2.0 License –
-see [LICENSE](https://github.com/metreeca/trio?tab=Apache-2.0-1-ov-file) file for details.
+see [LICENSE](https://github.com/grafctory/trio?tab=Apache-2.0-1-ov-file) file for details.

@@ -1,12 +1,17 @@
 # @grafctory/trio
 
-[![npm](https://img.shields.io/npm/v/@grafctory/trio)](https://www.npmjs.com/package/@grafctory/trio)
+[![npm][npm-badge]][npm]
+
+[npm-badge]: https://img.shields.io/npm/v/@grafctory/trio
+[npm]: https://www.npmjs.com/package/@grafctory/trio
+[grafctory]: https://github.com/grafctory
 
 RDF 1.1 data modelling, graph assembly and serialisation.
 
-**@grafctory/trio** provides an RDF substrate for TypeScript applications, covering the term and graph data model,
-declarative combinators for assembling graphs from domain objects, and codecs for standard RDF serialisations. Terms and
-graphs are built through validating factories and combinators, so that nothing malformed reaches a serialisation:
+**@grafctory/trio** is the RDF module of the [Grafctory][grafctory] model-driven knowledge graph framework. It provides
+an RDF substrate for TypeScript applications, covering the term and graph data model, declarative combinators for
+assembling graphs from domain objects, and codecs for standard RDF serialisations. Terms and graphs are built through
+validating factories and combinators, so that nothing malformed reaches a serialisation:
 
 - **Checked at Source**: malformed IRIs, blank-node labels, and language tags rejected where the term is built
 - **Immutable Records**: terms and statements returned frozen, safe to share across graphs
@@ -141,3 +146,5 @@ labels and throws a `SyntaxError` on a malformed statement; it is verified again
 
 This project is licensed under the Apache 2.0 License –
 see [LICENSE](https://github.com/grafctory/trio?tab=Apache-2.0-1-ov-file) file for details.
+
+<sub>Grafctory™ is a trademark of Metreeca srl.</sub>

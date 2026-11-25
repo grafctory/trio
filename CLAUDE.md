@@ -11,7 +11,7 @@
 
 # Overview
 
-`@grafctory/trio` is the RDF substrate shared across Metreeca packages: the term and graph data model, declarative
+`@grafctory/trio` is the RDF substrate shared across Grafctory packages: the term and graph data model, declarative
 combinators for assembling graphs from domain objects, and codecs for standard RDF serialisations.
 
 The package is query-language-agnostic and carries no store or protocol dependencies. SPARQL-specific concerns

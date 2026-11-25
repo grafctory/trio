@@ -10,20 +10,20 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/grafctory/trio/compare/v0.3.1...HEAD)
 
-## [0.3.1](https://github.com/metreeca/trio/compare/v0.3.0...v0.3.1) - 2026-11-24
+## [0.3.1](https://github.com/grafctory/trio/compare/v0.3.0...v0.3.1) - 2026-11-24
 
 ### Changed
 
 - Maintenance release with no change to the published API or behaviour
 
-## [0.3.0](https://github.com/metreeca/trio/compare/v0.2.0...v0.3.0) - 2026-11-17
+## [0.3.0](https://github.com/grafctory/trio/compare/v0.2.0...v0.3.0) - 2026-11-17
 
 ### Changed
 
 - **Breaking**: Upgrade `@metreeca/core` to `^0.14.0`; projects using Core alongside this package raise their own
   `@metreeca/core` dependency to `^0.14.0` as well, so that both packages share a single copy of Core
 
-## [0.2.0](https://github.com/metreeca/trio/compare/v0.1.3...v0.2.0) - 2026-10-19
+## [0.2.0](https://github.com/grafctory/trio/compare/v0.1.3...v0.2.0) - 2026-10-19
 
 ### Added
 
@@ -36,7 +36,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Upgrade `@metreeca/core` to `^0.13.0`
 
-## [0.1.3](https://github.com/metreeca/trio/compare/v0.1.2...v0.1.3) - 2026-10-14
+## [0.1.3](https://github.com/grafctory/trio/compare/v0.1.2...v0.1.3) - 2026-10-14
 
 ### Changed
 
@@ -44,7 +44,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Published exports declare the `@metreeca/source` condition, resolving each entry point to its TypeScript source in
   checkouts linked for local development, while registry consumers keep resolving to the compiled `dist` modules
 
-## [0.1.2](https://github.com/metreeca/trio/compare/v0.1.1...v0.1.2) - 2026-10-01
+## [0.1.2](https://github.com/grafctory/trio/compare/v0.1.1...v0.1.2) - 2026-10-01
 
 ### Changed
 
@@ -52,7 +52,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   is imported from `@metreeca/core/values` in place of `@metreeca/core/structures`
 - Raise the minimum supported Node.js version to `22.22.0`
 
-## [0.1.1](https://github.com/metreeca/trio/releases/tag/v0.1.1) - 2026-09-09
+## [0.1.1](https://github.com/grafctory/trio/releases/tag/v0.1.1) - 2026-09-09
 
 ### Added
 

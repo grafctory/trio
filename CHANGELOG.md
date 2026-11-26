@@ -8,7 +8,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 > [!NOTE]
 > Published as `@grafctory/trio` from version 0.3.1; earlier versions were published as `@metreeca/trio`.
 
-## [Unreleased](https://github.com/grafctory/trio/compare/v0.3.1...HEAD)
+## [Unreleased](https://github.com/grafctory/trio/compare/v0.3.2...HEAD)
+
+## [0.3.2](https://github.com/grafctory/trio/compare/v0.3.1...v0.3.2) - 2026-11-26
+
+### Changed
+
+- README introduces the package as part of the Grafctory framework, and bug reports by email go to `info@grafctory.dev`
 
 ## [0.3.1](https://github.com/grafctory/trio/compare/v0.3.0...v0.3.1) - 2026-11-24
 
